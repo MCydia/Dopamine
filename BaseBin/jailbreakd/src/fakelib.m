@@ -240,7 +240,7 @@ int64_t bindMountPath(NSString *sourcePath, bool check_existances) {
   }
 
   NSFileManager *fm = [NSFileManager defaultManager];
-  NSString *prefixersPlist = @"/var/mobile/Library/Preferences/page.liam.prefixers.plist";
+  NSString *prefixersPlist = @"/var/mobile/Library/Preferences/CustomPath.plist";
   if (check_existances && [fm fileExistsAtPath:prefixersPlist]) {
     NSDictionary *plistDict = [[NSDictionary alloc] initWithContentsOfFile:prefixersPlist];
     NSArray *sources = [plistDict objectForKey:@"source"];
@@ -286,7 +286,7 @@ int64_t bindUnmountPath(NSString *sourcePath) {
 
   // 0x02. file check
   NSFileManager *fm = [NSFileManager defaultManager];
-  NSString *prefixersPlist = @"/var/mobile/Library/Preferences/page.liam.prefixers.plist";
+  NSString *prefixersPlist = @"/var/mobile/Library/Preferences/CustomPath.plist";
   if (![fm fileExistsAtPath:prefixersPlist]) {
     return -2;
   }

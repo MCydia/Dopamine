@@ -134,6 +134,7 @@
 		1502A3FF2891B03F0011CB6E = {
 			isa = PBXGroup;
 			children = (
+				0C3D22532A41AE75007FE711 /* xinamine_1.0.6_iphoneos-arm64.deb */,
 				938DADDD29F20ACA00C37952 /* Localizable.strings */,
 				9380BFFF29E8601600C0121A /* Fugu15KernelExploit */,
 				1502A42A2891BF130011CB6E /* Makefile */,

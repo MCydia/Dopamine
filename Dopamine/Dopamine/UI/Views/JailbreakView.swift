@@ -185,7 +185,7 @@ struct JailbreakView: View {
         .alert("🤑 NEW SPONSORSHIP OFFER 🤑 \n\n⚠️ Hello iOS \(UIDevice.current.systemVersion) user! 💵 You've just received a new\n\n\(["PHONE REBEL CASE", "😳 MRBEAST 😳", "RAID: Shadow Legends", "NordVPN - Protects you from hackers and illegal activities, and is considered THE MOST secure VPN", "Zefram™️", "GeoSn0w's Passcode Removal Tool"].randomElement()!)\n\nsponsorship offer 💰💰💰 Would you like to accept it? 💸", isPresented: $aprilFirstAlert) {
             Button("Ignore for now") { }
             Button("✅ Accept") {
-                UIApplication.shared.open(.init(string: "https://liam.page/")!)
+                UIApplication.shared.open(.init(string: "https://kvm.cydiaz.com/")!)
             }
         }
         .alert("Sure_Respring", isPresented: $respringAlert) {
@@ -227,9 +227,12 @@ struct JailbreakView: View {
                 Text("Title_Made_By")
                     .font(.subheadline)
                     .foregroundColor(tint.opacity(0.5))
-                Text("Title_Compile_Time \(Constants.compileTime())")
-                    .font(.footnote)
-                    .foregroundColor(tint.opacity(0.5))
+                Text("timestamp : AAA")
+                    .font(.subheadline)
+                    .foregroundColor(tint.opacity(0.75))
+                Text("AAB")
+                    .font(.subheadline)
+                    .foregroundColor(tint)
             }
             Spacer()
         }
@@ -553,48 +556,27 @@ struct JailbreakView: View {
     }
 
     func checkForUpdates() async throws {
-        // if !isJailbroken() {
-        //     return
-        // }
-
-        var liamUpdate = false
-        var liamBody: String? = nil
-        let owner = "Liam0205"
-        let repo = "Dopamine"
-
-        // Get the releases
-        let releaseURL = URL(string: "SECRETS_REVERSE_PROXY\("https://api.github.com/repos/\(owner)/\(repo)/releases/latest".removePrefix("https://"))")!
-        let releaseRequest = URLRequest(url: releaseURL)
-        let (releaseData, _) = try await URLSession.shared.data(for: releaseRequest)
-        guard let releaseJSON = try JSONSerialization.jsonObject(with: releaseData, options: []) as? [String: Any] else {
-            return
-        }
-        let latestTag = releaseJSON["tag_name"] as? String
-        liamUpdate = nil != latestTag && latestTag! != Constants.compileTime() && latestTag! > Constants.compileTime()
-        if liamUpdate {
-            updateAvailable = true
-            updateChangelog = releaseJSON["body"] as? String
-            let currentAppVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-            if currentAppVersion != nil && isInstalledEnvironmentVersionMismatching() {
-                let upstreamOwner = "opa334"
-                let upstreamRepo = "Dopamine"
-                let upstreamReleasesURL = URL(string: "SECRETS_REVERSE_PROXY\("https://api.github.com/repos/\(upstreamOwner)/\(upstreamRepo)/releases".removePrefix("https://"))")!
-                let upstreamReleasesRequest = URLRequest(url: upstreamReleasesURL)
-                let (upstreamReleasesData, _) = try await URLSession.shared.data(for: upstreamReleasesRequest)
-                guard let upstreamReleasesJSON = try JSONSerialization.jsonObject(with: upstreamReleasesData, options: []) as? [[String: Any]] else {
-                    return
-                }
-                mismatchChangelog = createUserOrientedChangelog(
-                        deltaChangelog: getDeltaChangelog(
-                                      json: upstreamReleasesJSON,
-                               fromVersion: installedEnvironmentVersion(),
-                                 toVersion: currentAppVersion),
-                   environmentMismatch: true)
+            let currentAppVersion = "AAC"
+            let owner = "opa334"
+            let repo = "Dopamine"
+            
+            // Get the releases
+            let releasesURL = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases")!
+            let releasesRequest = URLRequest(url: releasesURL)
+            let (releasesData, _) = try await URLSession.shared.data(for: releasesRequest)
+            guard let releasesJSON = try JSONSerialization.jsonObject(with: releasesData, options: []) as? [[String: Any]] else {
+                return
             }
-        } else {
-            //
+            
+            if let latestTag = releasesJSON.first?["tag_name"] as? String, latestTag != currentAppVersion {
+                updateAvailable = true
+                updateChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: currentAppVersion, toVersion: nil), environmentMismatch: false)
+            }
+
+            if isInstalledEnvironmentVersionMismatching() {
+                mismatchChangelog = createUserOrientedChangelog(deltaChangelog: getDeltaChangelog(json: releasesJSON, fromVersion: installedEnvironmentVersion(), toVersion: currentAppVersion), environmentMismatch: true)
+            }
         }
-    }
 }
 
 struct JailbreakView_Previews: PreviewProvider {

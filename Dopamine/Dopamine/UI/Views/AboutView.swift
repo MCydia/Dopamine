@@ -83,7 +83,7 @@ struct AboutView: View {
                 }
             }
             .padding(.vertical)
-            
+
             LazyVGrid(columns: columns) {
                 ForEach(contributors, id: \.0) { contributor in
                     Link(destination: URL(string: contributor.1)!) {
@@ -99,13 +99,13 @@ struct AboutView: View {
             .opacity(0.6)
             .padding(.bottom)
             .padding(.horizontal, 16)
-            
-            
+
+
             Text("Credits_Header_Special_Thanks")
                 .fixedSize()
                 .font(.footnote)
                 .opacity(0.6)
-            
+
             HStack(spacing: 12) {
                 Button {
                     openURL(URL(string: "https://github.com/pinauten/Fugu15")!)
@@ -116,7 +116,7 @@ struct AboutView: View {
                         .frame(height: 24)
                         .opacity(0.5)
                 }
-                
+
                 Button {
                     openURL(URL(string: "https://pinauten.de/")!)
                 } label: {
@@ -131,6 +131,10 @@ struct AboutView: View {
             Group {
                 if !easterEgg {
                     Text("Credits_Footer_Dopamine_Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")\nOS:\(ProcessInfo.processInfo.operatingSystemVersionString)")
+                    Text("Credits_Footer_Dopamine_Hash \(Constants.commitShortHash())\n\(Constants.bundleID())")
+                        .fixedSize()
+                        .font(.footnote)
+                        .opacity(0.6)
                 } else {
                     Text(verbatim: "Wait, it's all Evyrest?\nAlways has been.")
                 }

@@ -38,6 +38,7 @@ NSString *generateSystemWideSandboxExtensions(void)
 
 __attribute__((constructor)) static void initializer(void)
 {
+	crashreporter_start();
 	bool comingFromUserspaceReboot = bootInfo_getUInt64(@"environmentInitialized");
 	if (comingFromUserspaceReboot) {
 

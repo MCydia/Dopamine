@@ -131,10 +131,6 @@ struct AboutView: View {
             Group {
                 if !easterEgg {
                     Text("Credits_Footer_Dopamine_Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown")\nOS:\(ProcessInfo.processInfo.operatingSystemVersionString)")
-                    Text("Credits_Footer_Dopamine_Hash \(Constants.commitShortHash())\n\(Constants.bundleID())")
-                        .fixedSize()
-                        .font(.footnote)
-                        .opacity(0.6)
                 } else {
                     Text(verbatim: "Wait, it's all Evyrest?\nAlways has been.")
                 }

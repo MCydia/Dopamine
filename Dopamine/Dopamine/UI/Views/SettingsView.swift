@@ -22,9 +22,7 @@ struct SettingsView: View {
     @AppStorage("rebuildEnvironment", store: dopamineDefaults()) var rebuildEnvironment: Bool = false
     @AppStorage("pathMappingEnabled", store: dopamineDefaults()) var pathMappingEnabled: Bool = true
     @AppStorage("blockDopamineUpdates", store: dopamineDefaults()) var blockDopamineUpdates: Bool = false
-    @AppStorage("presetUptimeInDay", store: dopamineDefaults()) var presetUptimeInDay: Double = 0.0
     @AppStorage("bridgeToXinA", store: dopamineDefaults()) var bridgeToXinA: Bool = false
-    @AppStorage("developmentMode", store: dopamineDefaults()) var developmentMode: Bool = false
 
     @State var pathMappingAlertShown = false
     @State var pathMappingInput = ""
@@ -177,24 +175,24 @@ struct SettingsView: View {
                                         )
                                     }
                                     if !isJailbroken() {
-                                        Button(action: {
-                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                            removeJailbreakAlertShown = true
-                                        }) {
-                                            HStack {
-                                                Image(systemName: "trash")
-                                                Text("Button_Remove_Jailbreak")
-                                                    .lineLimit(1)
-                                                    .minimumScaleFactor(0.5)
-                                            }
-                                            .padding(.horizontal, 4)
-                                            .padding(8)
-                                            .frame(maxWidth: .infinity)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                            )
-                                        }
+                                      Button(action: {
+                                          UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                          removeJailbreakAlertShown = true
+                                      }) {
+                                          HStack {
+                                              Image(systemName: "trash")
+                                              Text("Button_Remove_Jailbreak")
+                                                  .lineLimit(1)
+                                                  .minimumScaleFactor(0.5)
+                                          }
+                                          .padding(.horizontal, 4)
+                                          .padding(8)
+                                          .frame(maxWidth: .infinity)
+                                          .overlay(
+                                              RoundedRectangle(cornerRadius: 8)
+                                                  .stroke(Color.white.opacity(0.25), lineWidth: 0.5)
+                                          )
+                                      }
                                     }
                                     Text(isJailbroken() ? "Hint_Hide_Jailbreak_Jailbroken" : "Hint_Hide_Jailbreak")
                                         .font(.footnote)

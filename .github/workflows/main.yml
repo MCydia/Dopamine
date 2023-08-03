@@ -64,7 +64,7 @@ jobs:
       - name: Pre code
         run: |
           sed -i '' "s/AAA/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
-          sed -i '' "s/AAB/友情提示:换盆兑换区已开放兑换/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAB/友情提示: 换盆兑换区已开放兑换/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/"opa334"/"MCydia"/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
           sed -i '' "s/"opa334"/"MCydia"/g" ./Dopamine/Dopamine/UI/Views/UpdateDownloadingView.swift     

@@ -62,6 +62,51 @@ func reboot() {
     _ = execCmd(args: [CommandLine.arguments[0], "reboot"])
 }
 
+func doLdrestart() {
+    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+
+    // MARK: Fade out Animation
+    let view = UIView(frame: UIScreen.main.bounds)
+    view.backgroundColor = .black
+    view.alpha = 0
+
+    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
+        window.addSubview(view)
+        UIView.animate(withDuration: 0.2, delay: 0, animations: {
+            view.alpha = 1
+        })
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+        guard let ldrestartPath = rootifyPath(path: "/usr/bin/ldrestart") else {
+            return
+        }
+        _ = execCmd(args: [ldrestartPath])
+    })
+}
+
+func doReboot() {
+    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+
+    // MARK: Fade out Animation
+    let view = UIView(frame: UIScreen.main.bounds)
+    view.backgroundColor = .black
+    view.alpha = 0
+
+    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
+        window.addSubview(view)
+        UIView.animate(withDuration: 0.2, delay: 0, animations: {
+            view.alpha = 1
+        })
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+        guard let rebootPath = rootifyPath(path: "/usr/sbin/reboot") else {
+            return
+        }
+        _ = execCmd(args: [rebootPath])
+    })
+}
 func isJailbroken() -> Bool {
     if isSandboxed() { return false } // ui debugging
     
@@ -179,8 +224,46 @@ func updateEnvironment() {
     jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
 }
 
+func doUpdateEnvironment() {
+    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+
+    // MARK: Fade out Animation
+    let view = UIView(frame: UIScreen.main.bounds)
+    view.backgroundColor = .black
+    view.alpha = 0
+
+    for window in UIApplication.shared.connectedScenes.map({ $0 as? UIWindowScene }).compactMap({ $0 }).flatMap({ $0.windows.map { $0 } }) {
+        window.addSubview(view)
+        UIView.animate(withDuration: 0.2, delay: 0, animations: {
+            view.alpha = 1
+        })
+    }
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+        jbdUpdateFromBasebinTar(Bundle.main.bundlePath + "/basebin.tar", true)
+    })
+}
 
 // debugging
 func isSandboxed() -> Bool {
     !FileManager.default.isWritableFile(atPath: "/var/mobile/")
+}
+func bindMount(path: String) {
+    if path.count > 0 && !(path.starts(with:"/var/jb/")) {
+        _ = execCmd(args: ["/var/jb/basebin/jbctl", "bindmount_path", path])
+    }
+}
+
+func bindUnmount(path: String) {
+    if path.count > 0 && !(path.starts(with:"/var/jb/")) {
+        _ = execCmd(args: ["/var/jb/basebin/jbctl", "bindunmount_path", path])
+    }
+}
+
+func isPathMappingEnabled() -> Bool {
+    let dpDefaults = dopamineDefaults()
+    let enableMount = dpDefaults.bool(forKey: "pathMappingEnabled")
+    let prefixersPlist = "/var/jb/var/mobile/Library/Preferences/CustomPath.plist"
+    let isMappingPlistExists = FileManager.default.fileExists(atPath: prefixersPlist)
+    return enableMount && isMappingPlistExists;
 }

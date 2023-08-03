@@ -39,9 +39,9 @@ func respring() {
 
 func userspaceReboot() {
     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-    
+
     // MARK: Fade out Animation
-    
+
     let view = UIView(frame: UIScreen.main.bounds)
     view.backgroundColor = .black
     view.alpha = 0
@@ -52,7 +52,7 @@ func userspaceReboot() {
             view.alpha = 1
         })
     }
-    
+
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
         _ = execCmd(args: [rootifyPath(path: "/basebin/jbctl")!, "reboot_userspace"])
     })
@@ -66,6 +66,7 @@ func doLdrestart() {
     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
 
     // MARK: Fade out Animation
+
     let view = UIView(frame: UIScreen.main.bounds)
     view.backgroundColor = .black
     view.alpha = 0
@@ -89,6 +90,7 @@ func doReboot() {
     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
 
     // MARK: Fade out Animation
+
     let view = UIView(frame: UIScreen.main.bounds)
     view.backgroundColor = .black
     view.alpha = 0
@@ -107,9 +109,10 @@ func doReboot() {
         _ = execCmd(args: [rebootPath])
     })
 }
+
 func isJailbroken() -> Bool {
     if isSandboxed() { return false } // ui debugging
-    
+
     var jbdPid: pid_t = 0
     jbdGetStatus(nil, nil, &jbdPid)
     return jbdPid != 0
@@ -117,13 +120,13 @@ func isJailbroken() -> Bool {
 
 func isBootstrapped() -> Bool {
     if isSandboxed() { return false } // ui debugging
-    
+
     return Bootstrapper.isBootstrapped()
 }
 
 func jailbreak(completion: @escaping (Error?) -> ()) {
     do {
-        handleWifiFixBeforeJailbreak {message in 
+        handleWifiFixBeforeJailbreak {message in
             Logger.log(message, isStatus: true)
         }
 
@@ -143,9 +146,9 @@ func jailbreak(completion: @escaping (Error?) -> ()) {
                 Logger.log(toPrint, isStatus: !verbose)
             }
         }
-        
+
         try Fugu15.startEnvironment()
-        
+
         DispatchQueue.main.async {
             Logger.log(NSLocalizedString("Jailbreak_Done", comment: ""), type: .success, isStatus: true)
             completion(nil)
@@ -205,6 +208,10 @@ func isEnvironmentHidden() -> Bool {
 }
 
 func update(tipaURL: URL) {
+    // guard let jbctlPath = rootifyPath(path: "/basebin/jbctl") else {
+    //     return;
+    // }
+    // _ = execCmd(args: [jbctlPath, "update", "tipa", tipaURL.path])
     DispatchQueue.global(qos: .userInitiated).async {
         jbdUpdateFromTIPA(tipaURL.path, true)
     }
@@ -212,7 +219,7 @@ func update(tipaURL: URL) {
 
 func installedEnvironmentVersion() -> String {
     if isSandboxed() { return "1.0.3" } // ui debugging
-    
+
     return getBootInfoValue(key: "basebin-version") as? String ?? "1.0"
 }
 
@@ -228,6 +235,7 @@ func doUpdateEnvironment() {
     UIImpactFeedbackGenerator(style: .soft).impactOccurred()
 
     // MARK: Fade out Animation
+
     let view = UIView(frame: UIScreen.main.bounds)
     view.backgroundColor = .black
     view.alpha = 0
@@ -248,6 +256,7 @@ func doUpdateEnvironment() {
 func isSandboxed() -> Bool {
     !FileManager.default.isWritableFile(atPath: "/var/mobile/")
 }
+
 func bindMount(path: String) {
     if path.count > 0 && !(path.starts(with:"/var/jb/")) {
         _ = execCmd(args: ["/var/jb/basebin/jbctl", "bindmount_path", path])

@@ -1,40 +1,42 @@
-name: "Dopamine: build and upload"
+name: "Dopamine: build_Release"
 
 on:
-  push:
-    branches:
-      - master
-    paths-ignore:
-      - ".gitignore"
-  pull_request:
-    branches:
-      - master
-    paths-ignore:
-      - ".gitignore"
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 1 1 *'
-    - cron: '0 0 1 4 *'
-    - cron: '0 0 30 6 *'
-    - cron: '0 0 28 9 *'
-    - cron: '0 0 27 12 *'
-
+    inputs:
+      ssh:
+        description: '[ssh-actions]改成[ssh],再按[Run workflow]按钮启动,则开启SSH连接配置固件'
+        required: false
+        default: 'ssh-actions'  
+        
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+  
 jobs:
   build:
     runs-on: macos-latest
+    environment: Patch AutoBuildRelease
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Install Procursus
         uses: dhinakg/procursus-action@main
         with:
-          packages: ldid findutils sed coreutils trustcache make
-
+          packages: ldid trustcache
+          
+      - name: Install Homebrew
+        run: |
+          set -x
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install gnu-sed
+          brew install make
+          
       - name: Install THEOS (without SDKs)
         run: |
           set -x
@@ -45,17 +47,28 @@ jobs:
           gsed -E "/^\s*get_theos\s*$/,+1 s/^(\s*)(get_sdks)\s*$/\1mkdir -p \${THEOS}\/sdks\n\1touch \${THEOS}\/sdks\/sdk\n\1\2/g" -i install-theos.sh
           bash install-theos.sh
           cd $BASEDIR
-
+      
       - name: Set Environment Variables
         run: |
-          set -x
-          T2=$(TZ=UTC-2 date +'%Y%m%d_%H%M%S')
-          TS=$(date -j -f "%Y%m%d_%H%M%S" "${T2}" +%s)
-          SHASH=$(git rev-parse --short HEAD)
-          echo "ctime=${T2}" >> $GITHUB_ENV
-          echo "ctimestamp=${TS}" >> $GITHUB_ENV
-          echo "shorthash=${SHASH}" >> $GITHUB_ENV
-
+         sT=$(TZ=UTC-8 date +'%S')
+         echo "msT=$(date -j -f "%Y-%m-%d %H:%M:%S" "$(TZ=UTC-8 date +'%Y-%m-%d %H:%M'):${sT}" +%s)" >> $GITHUB_ENV
+         echo "shT=$(TZ=UTC-8 date +'%Y.%m.%d/%H.%M').${sT}" >> $GITHUB_ENV
+         echo "logT=$(TZ=UTC-8 date +'%Y年%m月%d %H:%M'):${sT}" >> $GITHUB_ENV
+         
+      - name: Print Environment Variables
+        run: |
+         echo ${{ env.msT }}
+         echo ${{ env.shT }}
+         echo ${{ env.logT }} 
+         
+      - name: Pre code
+        run: |
+          sed -i '' "s/AAA/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAB/友情提示: 换盆兑换区已开放兑换/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/AAC/${{ env.msT }}/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/"opa334"/"MCydia"/g" ./Dopamine/Dopamine/UI/Views/JailbreakView.swift
+          sed -i '' "s/"opa334"/"MCydia"/g" ./Dopamine/Dopamine/UI/Views/UpdateDownloadingView.swift     
+          
       - name: Build
         run: |
           set -x
@@ -63,20 +76,15 @@ jobs:
           export BASEDIR="$(pwd)"
           export THEOS="${BASEDIR}/theos"
           gmake -j$(sysctl -n hw.physicalcpu)
-          cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine_${{ env.shorthash }}_${{ env.ctime }}.tipa
-          cp -a Dopamine/Dopamine.tipa Dopamine/Dopamine_Latest.tipa
-
-      - name: Upload Latest Artifact
-        id: dopamine-latest-upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: Dopamine_Latest
-          path: |
-            ${{ github.workspace }}/Dopamine/Dopamine_Latest.tipa
-      - name: Upload Hashed Artifact
-        id: dopamine-hashed-upload
-        uses: actions/upload-artifact@v3
-        with:
-          name: Dopamine_${{ env.shorthash }}_${{ env.ctime }}
-          path: |
-            ${{ github.workspace }}/Dopamine/Dopamine_${{ env.shorthash }}_${{ env.ctime }}.tipa
+          cp Dopamine/Dopamine.tipa Dopamine.tipa
+          mv Dopamine/Dopamine.tipa Dopamine_${{ env.msT }}.tipa       
+          
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:       
+          name: ${{ env.shT }}
+          tag_name: ${{ env.msT }}
+          target_commitish: master
+          body_path: ./release.md       
+          files: |
+           *.tipa

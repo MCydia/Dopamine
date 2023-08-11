@@ -423,6 +423,7 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 				}
 			}
 		}
+	}
 
 	// Blacklist to ensure general system stability
 	// I don't like this but for some processes it seems neccessary

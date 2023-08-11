@@ -416,10 +416,13 @@ kBinaryConfig configForBinary(const char* path, char *const argv[restrict])
 						// Skip ReportCrash too as it might need to execute while jailbreakd is in a crashed state
 						return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
 					}
+					else if (!strcmp(argv[1], "com.apple.ReportMemoryException")) {
+						// Skip ReportMemoryException too as it might need to execute while jailbreakd is in a crashed state
+						return (kBinaryConfigDontInject | kBinaryConfigDontProcess);
+					}
 				}
 			}
 		}
-	}
 
 	// Blacklist to ensure general system stability
 	// I don't like this but for some processes it seems neccessary

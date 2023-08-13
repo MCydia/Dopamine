@@ -109,9 +109,9 @@ uint64_t kpacda(uint64_t pointer, uint64_t modifier)
 	uint64_t pacda_gadget = bootInfo_getSlidUInt64(@"pacda_gadget");
 	/*
 	|------- GADGET -------|
-	| cmp x1, #0		   |
+	| cmp x1, #0		   |
 	| pacda x1, x9         |
-	| str x9, [x8]         |
+	| str x9, [x8]         |
 	| csel x9, xzr, x1, eq |
 	| ret                  |
 	|----------------------|
@@ -132,9 +132,8 @@ uint64_t kpacda(uint64_t pointer, uint64_t modifier)
 
 uint64_t kptr_sign(uint64_t kaddr, uint64_t pointer, uint16_t salt)
 {
-	extern uint64_t xpaci(uint64_t a);
 	uint64_t modifier = (kaddr & 0xffffffffffff) | ((uint64_t)salt << 48);
-	return kpacda(xpaci(pointer), modifier);
+	return kpacda(unsign_kptr(pointer), modifier);
 }
 
 void kwrite_ptr(uint64_t kaddr, uint64_t pointer, uint16_t salt)
